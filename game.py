@@ -2,15 +2,15 @@ import math
 import random
 import pygame
 from pygame import mixer
-
 # Pygame initialization
 pygame.init()
 
 # Background music
 mixer.music.load('res/background.wav')
-mixer.music.play(-1)
+mixer.music.play(-1) 
 
-score         = 0
+
+score         = 0            # Kills
 TITLE         = 'Space Wars' # Game title
 WINDOW_HEIGHT = 800          # Height
 WINDOW_WIDTH  = 600          # WIDTH
@@ -28,10 +28,9 @@ Xy = 480
 xVelocity = 0
 xIMG = pygame.image.load('/home/eclipse/Documents/Workspace/Space Wars/res/player.png')
 
-
 # TIE-FIGHTER
-Tx = random.randint(0, 736)
-Ty = random.randint(50, 150)
+Tx = random.randint(0, 700)
+Ty = 100
 tVelocity = 10
 tIMG = pygame.image.load('/home/eclipse/Documents/Workspace/Space Wars/res/enemy.png')
 
@@ -40,41 +39,89 @@ shooting = False
 Lx = 0
 Ly = 480
 lVelocity = 30
-lIMG = pygame.image.load('/home/eclipse/Documents/Workspace/Space Wars/res/bullet.png')
+leser = pygame.image.load('res/bullet.png')
 
 # SCORE
 score_font = pygame.font.Font('res/Starjedi.ttf', 32)
 Sx = 10
 Sy = 10
 
+# T_Leser
+t_shooting = False
+Tlx = 0
+Tly = 100
+tLeser = pygame.image.load('res/bullet.png')
+TlVelocity = 30
+
+
 def show_score(x, y ,s ):
-    score_  = score_font.render(f"Kills: {str(score)}" , True, (255, 255, 255))
-    screen.blit(score_, (x, y))
+    """displays the score in the screen
+        font: starwars font"""
+    score_  = score_font.render(f"Kills: {str(score)}" , True, (255, 255, 255))  # Score variabe
+    screen.blit(score_, (x, y))                                                  # Display score
+
+
 
 def x_wing(x, y):
     """PLAYER"""
-    screen.blit(xIMG, (x, y))
+    screen.blit(xIMG, (x, y)) # Draw Xwing | i.e player
+
+
 
 def spwan():
+    """SPWANS TIE FIGHTER AFTER 1 IS KILELD
+    re spwans the tie fighter in random location between 0x - 700x
+    """
     global Tx, Ty
-    Tx = random.randint(0, 756)
-    Ty = random.randint(50, 150)
+    # These variables will re summon
+    Tx = random.randint(0, 700)
+    Ty = 100
+
 
 
 def tie_fighter(x, y):
-    """ENEMY"""
-    screen.blit(tIMG, (x, y))
+    """ENEMY """
+    screen.blit(tIMG, (x, y)) # Draws tie Fighter
 
 
 
-def fire_bullet(x, y):
-    global shooting
-    shooting = True
-    screen.blit(lIMG, (x + 16, y + 10))
+def tie_fighter_movement(x, y):
+    """LEFT AND RIGHT MOVEMENT OF TIE FIGHTER
+    :arguments:
+        :tVelocity: The velocity of the fighter, more it is the faster the fighter moves
+
+    :useage: moves the tiw fighter left and right making it difficult for the player to hit the tie fighter 
+    """
+    global Tx, tVelocity
+    Tx += tVelocity     # Core of this function, this will add values to X cordinate of the fighter.
+    if Tx >= 736:       # This will stop the fighter from going out of the screen
+        tVelocity = -10 # Change the velocity to negetive which will make the fighter go left isntead
+    if Tx <= 0:         # This will too stop the fighter from going out of the screen
+        tVelocity = 10  # Change the velocity to negetive which will make the fighter go right isntead
+
+
+
+def tFire(x=Tx, y=Tly):
+    """FIRING SYSTEM
+        :usage: firing function of tie fighter, a challange for the player
+    """
+    global t_shooting
+    t_shooting = True                    # THIS WILL PREVENT THE LESER FOLLWOING THE PLAYER
+    screen.blit(tLeser, (x +16, y + 10)) # Draws the leser
+
+
+def xFire(x, y):
+    """FIRING SYSTEM
+        :usage: firing function of xwing.
+    """
+    global shooting 
+    shooting = True                      # THIS WILL PREVENT THE LESER FOLLWOING THE PLAYER
+    screen.blit(leser, (x + 16, y + 10)) # Draws the leser
+
+
 
 def XxMovement():
     """MOVEMENTS OF X WING
-
     :Xx: GLOBAL VARIABLE OF XWING'S X AXIS
 
     #USEAGE: PLAYER CONTROLLED XWING""" 
@@ -105,24 +152,54 @@ def XyMovement():
     
 
 def lMovement():
+    """Leser movement
+    :usage: leser for xwing movement. this will make the leser go brrrrrrr
+    """
     global Ly, shooting
+    # Prevents the lser going out of screen
     if Ly <= 0:
         Ly = 480
         shooting = False
+    # brrrr
     if shooting == True:
        
-        fire_bullet(Lx, Ly)
+        xFire(Lx, Ly)
         Ly -= lVelocity
+    
+
+
+def Tl_movement():
+    """Leser movement
+    :usage: tie fighters leser movement. this will make the leser go brrrrrrr
+    """
+    global TlX, Tly, t_shooting
+    # Prevents the lser going out of screen
+    if Tly >= 600:
+        Tly = 100
+        t_shooting = False
+    # brrrr
+    if t_shooting == True:
+        tFire(Tlx, Tly)
+        Tly += 30
 
 
 
-      
-
-
-
+def TiAI(x, Tly):
+    """A psudo Ai for the enemy fighter.
+    :arguments:
+        :sfx:    sound effeft
+        :AiRand: creates a random number, if the number is 10, then brrr, ik cringe but WFM mate. 
+    :usage: Helps our no brainer tie fighter to shoot the leser
+        """
+    global Tx, Tlx
+    AiRand = random.randint(0, 50)
+    if AiRand == 10 and not t_shooting:
+        sfx = mixer.Sound('res/t_shooting.wav')
+        sfx.play()
+        Tlx = Tx
+        tFire(Tlx, Tly)
 # GAME LOOP
 while running:
-    
     screen.fill((1,1,1)) 
     # Implementing background image
     screen.blit(background, (0, 0))
@@ -141,16 +218,25 @@ while running:
                 xVelocity = 20
             # UP
             if event.key == pygame.K_UP:
-                xVelocity = -20
+                lVelocity = -20
             if event.key == pygame.K_DOWN:
-                xVelocity = 20
+                lVelocity = 20
             # FIRING SYSTEM
             if event.key == pygame.K_SPACE:
                 if not shooting:
                     lSFX = mixer.Sound('/home/eclipse/Documents/Workspace/Space Wars/res/shoooting.wav')
                     lSFX.play()
                     Lx = Xx
-                    fire_bullet(Lx, Ly)
+                    xFire(Lx, Ly)
+            # Enemmy manual fire
+            if event.key == pygame.K_RETURN:
+                if not shooting:
+                    sfx = mixer.Sound('res/t_shooting.wav')
+                    sfx.play()
+                    Tlx = Tx
+                    print(Tlx)
+                    tFire(Tlx, Tly)
+                
 
         # KEYREALSE EVENT
         if event.type == pygame.KEYUP:
@@ -160,16 +246,37 @@ while running:
                 xVelocity = 0
 
     BLACK = 1,1,1
-    xw_hitbox = pygame.Rect(Xx, Xy, 64, 64)    
+    xw_hitbox = pygame.Rect(Xx, Xy, 64, 64)     # Xwing's hitbox     
+    ls_hitbox = pygame.Rect(Lx, Ly, 32, 32)     # Xwing's lesers hitbox
+    tl_hitbox = pygame.Rect(Tlx, Tly, 32, 32)   # Tie fighter hitbox
+    tf_hitbox = pygame.Rect(Tx, Ty, 64, 64)     # Tie fighter lesers hitbox
+    
 
-    tf_hitbox = pygame.Rect(Tx, Ty, 64, 64)
 
-    ls_hitbox = pygame.Rect(Lx, Ly, 32, 32)
+    # collision check between enemy and player
+    if tl_hitbox.colliderect(xw_hitbox):
+        """
+        :arguments:
+            :exSFX: sound effect
+            :score: Decrease when hitten
+            :t_shooting: sets shooting to falase
 
+        """
+        exSFX = mixer.Sound('res/explosion.wav')
+        exSFX.play()
+        Tly = 100
+        score -= 1
+        t_shooting = False
 
-    # CLOOSION
-
+    # collision check between player and enemy
     if ls_hitbox.colliderect(tf_hitbox):
+        """
+        :arguments:
+            :exSFX: sound effect
+            :score: Increase when hitten
+            :t_shooting: sets shooting to falase
+
+        """
         exSFX = mixer.Sound('res/explosion.wav')
         exSFX.play()
         Ly = 480
@@ -177,10 +284,17 @@ while running:
         shooting = False
         spwan()
     
-    tie_fighter(Tx, Ty)    
+    # Tie figher summoners
+    tie_fighter(Tx, Ty)  
+    Tl_movement()
+    tie_fighter_movement(Tx, Ty)
+    TiAI(Tly, Tly)
+
+    # Xwing summoners
+    x_wing(Xx, Xy)
     lMovement()
     XxMovement()
-    x_wing(Xx, Xy)
     
+    # Display score
     show_score(Sx, Sy, score)
-    pygame.display.update()
+    pygame.display.update() # Honestly, IDK WHAT THIS DOES LOL
