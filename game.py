@@ -6,7 +6,7 @@ from pygame import mixer
 pygame.init()
 
 # Background music
-mixer.music.load('res/background.wav')
+mixer.music.load('res/sfx/background.wav')
 mixer.music.play(-1) 
 
 
@@ -20,29 +20,31 @@ lLollision    = False
 # GAME GUI
 pygame.display.set_caption(TITLE)
 screen = pygame.display.set_mode((WINDOW_HEIGHT, WINDOW_WIDTH))
-background = pygame.image.load('/home/eclipse/Documents/Workspace/Space Wars/res/background.png')
+background = pygame.image.load('res/Sprites/background.png')
 
 # X-WING
 Xx = 370
 Xy = 480
 xVelocity = 0
-xIMG = pygame.image.load('/home/eclipse/Documents/Workspace/Space Wars/res/player.png')
+xIMG = pygame.image.load('res/Sprites/player.png')
 
 # TIE-FIGHTER
 Tx = random.randint(0, 700)
 Ty = 100
 tVelocity = 10
-tIMG = pygame.image.load('/home/eclipse/Documents/Workspace/Space Wars/res/enemy.png')
+tIMG = pygame.image.load('res/Sprites/enemy.png')
 
 # LEASER
 shooting = False
 Lx = 0
 Ly = 480
 lVelocity = 30
-leser = pygame.image.load('res/bullet.png')
+leser = pygame.image.load('res/Sprites/bullet.png')
+
+# Coordinates
 
 # SCORE
-score_font = pygame.font.Font('res/Starjedi.ttf', 32)
+score_font = pygame.font.Font('res/fonts/Starjedi.ttf', 32)
 Sx = 10
 Sy = 10
 
@@ -50,7 +52,7 @@ Sy = 10
 t_shooting = False
 Tlx = 0
 Tly = 100
-tLeser = pygame.image.load('res/bullet.png')
+tLeser = pygame.image.load('res/Sprites/bullet.png')
 TlVelocity = 30
 
 
@@ -192,12 +194,24 @@ def TiAI(x, Tly):
     :usage: Helps our no brainer tie fighter to shoot the leser
         """
     global Tx, Tlx
-    AiRand = random.randint(0, 50)
-    if AiRand == 10 and not t_shooting:
-        sfx = mixer.Sound('res/t_shooting.wav')
+    global Tx, Xx, Ty, Xy
+    distance = math.sqrt((math.pow(Tx-Xx, 2) + math.pow(Ty-Xy, 2)))
+
+    AiRand = random.randint(0, 20)
+    if (AiRand == 10 or AiRand == 15 or AiRand == 10) and not t_shooting:
+        sfx = mixer.Sound('res/sfx/t_shooting.wav')
         sfx.play()
         Tlx = Tx
         tFire(Tlx, Tly)
+
+
+def display_cordinates(x, y):
+    pass
+    # xy = score_font.render(f'{str(distance)} ', True,  (255, 255, 255))
+    # screen.blit(xy, (x, y))
+
+
+
 # GAME LOOP
 while running:
     screen.fill((1,1,1)) 
@@ -224,14 +238,14 @@ while running:
             # FIRING SYSTEM
             if event.key == pygame.K_SPACE:
                 if not shooting:
-                    lSFX = mixer.Sound('/home/eclipse/Documents/Workspace/Space Wars/res/shoooting.wav')
+                    lSFX = mixer.Sound('res/sfx/shoooting.wav')
                     lSFX.play()
                     Lx = Xx
                     xFire(Lx, Ly)
             # Enemmy manual fire
             if event.key == pygame.K_RETURN:
                 if not shooting:
-                    sfx = mixer.Sound('res/t_shooting.wav')
+                    sfx = mixer.Sound('res/sfx/t_shooting.wav')
                     sfx.play()
                     Tlx = Tx
                     print(Tlx)
@@ -262,7 +276,7 @@ while running:
             :t_shooting: sets shooting to falase
 
         """
-        exSFX = mixer.Sound('res/explosion.wav')
+        exSFX = mixer.Sound('res/sfx/explosion.wav')
         exSFX.play()
         Tly = 100
         score -= 1
@@ -277,7 +291,7 @@ while running:
             :t_shooting: sets shooting to falase
 
         """
-        exSFX = mixer.Sound('res/explosion.wav')
+        exSFX = mixer.Sound('res/sfx/explosion.wav')
         exSFX.play()
         Ly = 480
         score += 1
@@ -297,4 +311,7 @@ while running:
     
     # Display score
     show_score(Sx, Sy, score)
+
+    # Display cordinates
+    display_cordinates(Xx, Xy)
     pygame.display.update() # Honestly, IDK WHAT THIS DOES LOL
