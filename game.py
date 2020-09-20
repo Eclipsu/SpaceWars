@@ -6,8 +6,7 @@ from pygame import mixer
 pygame.init()
 
 # Background music
-mixer.music.load('res/sfx/background.wav')
-mixer.music.play(-1) 
+
 
 
 score         = 0            # Kills
@@ -15,12 +14,14 @@ TITLE         = 'Space Wars' # Game title
 WINDOW_HEIGHT = 800          # Height
 WINDOW_WIDTH  = 600          # WIDTH
 running       = True         # GAME LOOP STATE
+menu_running  = True
 lLollision    = False
 
 # GAME GUI
 pygame.display.set_caption(TITLE)
 screen = pygame.display.set_mode((WINDOW_HEIGHT, WINDOW_WIDTH))
 background = pygame.image.load('res/Sprites/background.png')
+menu_background = pygame.image.load('res/Sprites/menu_screen.png')
 
 # X-WING
 Xx = 370
@@ -207,111 +208,132 @@ def TiAI(x, Tly):
 
 def display_cordinates(x, y):
     pass
-    # xy = score_font.render(f'{str(distance)} ', True,  (255, 255, 255))
-    # screen.blit(xy, (x, y))
-
-
-
 # GAME LOOP
-while running:
-    screen.fill((1,1,1)) 
-    # Implementing background image
-    screen.blit(background, (0, 0))
-    #  Event listener
-    for event in pygame.event.get():
-        # On close button function
-        if event.type == pygame.QUIT:
-            running = False
-        # KEY PRESSED EVENTS
-        if event.type == pygame.KEYDOWN:
-            # LEFT KEY
-            if event.key == pygame.K_LEFT:
-                xVelocity = -20
-            # RIGHT KEY
-            if event.key == pygame.K_RIGHT:
-                xVelocity = 20
-            # UP
-            if event.key == pygame.K_UP:
-                lVelocity = -20
-            if event.key == pygame.K_DOWN:
-                lVelocity = 20
-            # FIRING SYSTEM
-            if event.key == pygame.K_SPACE:
-                if not shooting:
-                    lSFX = mixer.Sound('res/sfx/shoooting.wav')
-                    lSFX.play()
-                    Lx = Xx
-                    xFire(Lx, Ly)
-            # Enemmy manual fire
-            if event.key == pygame.K_RETURN:
-                if not shooting:
-                    sfx = mixer.Sound('res/sfx/t_shooting.wav')
-                    sfx.play()
-                    Tlx = Tx
-                    print(Tlx)
-                    tFire(Tlx, Tly)
-                
-
-        # KEYREALSE EVENT
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                xVelocity = 0
-            if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
-                xVelocity = 0
-
-    BLACK = 1,1,1
-    xw_hitbox = pygame.Rect(Xx, Xy, 64, 64)     # Xwing's hitbox     
-    ls_hitbox = pygame.Rect(Lx, Ly, 32, 32)     # Xwing's lesers hitbox
-    tl_hitbox = pygame.Rect(Tlx, Tly, 32, 32)   # Tie fighter hitbox
-    tf_hitbox = pygame.Rect(Tx, Ty, 64, 64)     # Tie fighter lesers hitbox
-    
 
 
-    # collision check between enemy and player
-    if tl_hitbox.colliderect(xw_hitbox):
-        """
-        :arguments:
-            :exSFX: sound effect
-            :score: Decrease when hitten
-            :t_shooting: sets shooting to falase
+def menu_loop():
+    mixer.music.load('res/sfx/menu_song.wav')
+    mixer.music.play(-1)
+    menu_running = True
+    while menu_running:
+        screen.fill((1,1,1))
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    menu_running = False
+        screen.blit(menu_background, (0, 0))
+        pygame.display.update()
 
-        """
-        exSFX = mixer.Sound('res/sfx/explosion.wav')
-        exSFX.play()
-        Tly = 100
-        score -= 1
-        t_shooting = False
 
-    # collision check between player and enemy
-    if ls_hitbox.colliderect(tf_hitbox):
-        """
-        :arguments:
-            :exSFX: sound effect
-            :score: Increase when hitten
-            :t_shooting: sets shooting to falase
 
-        """
-        exSFX = mixer.Sound('res/sfx/explosion.wav')
-        exSFX.play()
-        Ly = 480
-        score += 1
-        shooting = False
-        spwan()
-    
-    # Tie figher summoners
-    tie_fighter(Tx, Ty)  
-    Tl_movement()
-    tie_fighter_movement(Tx, Ty)
-    TiAI(Tly, Tly)
 
-    # Xwing summoners
-    x_wing(Xx, Xy)
-    lMovement()
-    XxMovement()
-    
-    # Display score
-    show_score(Sx, Sy, score)
+def game_loop():
+    mixer.music.load('res/sfx/background.wav')
+    mixer.music.play(-1) 
+    global t_shooting, running, screen, Tx, Ty, Xx, Xy, Lx, Ly, Tlx, Tly, tVelocity, xVelocity, tVelocity, tLeser, TlVelocity, lVelocity, score, shooting
+    while running:
+        screen.fill((1,1,1)) 
+        # Implementing background image
+        screen.blit(background, (0, 0))
+        #  Event listener
+        for event in pygame.event.get():
+            # On close button function
+            if event.type == pygame.QUIT:
+                running = False
+            # KEY PRESSED EVENTS
+            if event.type == pygame.KEYDOWN:
+                # LEFT KEY
+                if event.key == pygame.K_LEFT:
+                    xVelocity = -20
+                # RIGHT KEY
+                if event.key == pygame.K_RIGHT:
+                    xVelocity = 20
+                # UP
+                if event.key == pygame.K_UP:
+                    lVelocity = -20
+                if event.key == pygame.K_DOWN:
+                    lVelocity = 20
+                # FIRING SYSTEM
+                if event.key == pygame.K_SPACE:
+                    if not shooting:
+                        lSFX = mixer.Sound('res/sfx/shoooting.wav')
+                        lSFX.play()
+                        Lx = Xx
+                        xFire(Lx, Ly)
+                # Enemmy manual fire
+                if event.key == pygame.K_RETURN:
+                    if not shooting:
+                        sfx = mixer.Sound('res/sfx/t_shooting.wav')
+                        sfx.play()
+                        Tlx = Tx
+                        print(Tlx)
+                        tFire(Tlx, Tly)
+                    
 
-    # Display cordinates
-    display_cordinates(Xx, Xy)
-    pygame.display.update() # Honestly, IDK WHAT THIS DOES LOL
+            # KEYREALSE EVENT
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                    xVelocity = 0
+                if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                    xVelocity = 0
+
+        BLACK = 1,1,1
+        xw_hitbox = pygame.Rect(Xx, Xy, 64, 64)     # Xwing's hitbox     
+        ls_hitbox = pygame.Rect(Lx, Ly, 32, 32)     # Xwing's lesers hitbox
+        tl_hitbox = pygame.Rect(Tlx, Tly, 32, 32)   # Tie fighter hitbox
+        tf_hitbox = pygame.Rect(Tx, Ty, 64, 64)     # Tie fighter lesers hitbox
+
+
+
+        # collision check between enemy and player
+        if tl_hitbox.colliderect(xw_hitbox):
+            """
+            :arguments:
+                :exSFX: sound effect
+                :score: Decrease when hitten
+                :t_shooting: sets shooting to falase
+
+            """
+            exSFX = mixer.Sound('res/sfx/explosion.wav')
+            exSFX.play()
+            Tly = 100
+            score -= 1
+            t_shooting = False
+
+        # collision check between player and enemy
+        if ls_hitbox.colliderect(tf_hitbox):
+            """
+            :arguments:
+                :exSFX: sound effect
+                :score: Increase when hitten
+                :t_shooting: sets shooting to falase
+
+            """
+            exSFX = mixer.Sound('res/sfx/explosion.wav')
+            exSFX.play()
+            Ly = 480
+            score += 1
+            shooting = False
+            spwan()
+
+        # Tie figher summoners
+        tie_fighter(Tx, Ty)  
+        Tl_movement()
+        tie_fighter_movement(Tx, Ty)
+        TiAI(Tly, Tly)
+
+        # Xwing summoners
+        x_wing(Xx, Xy)
+        lMovement()
+        XxMovement()
+
+        # Display score
+        show_score(Sx, Sy, score)
+
+        # Display cordinates
+        display_cordinates(Xx, Xy)
+        pygame.display.update() # Honestly, IDK WHAT THIS DOES LOL
+
+
+menu_loop()
+game_loop()
