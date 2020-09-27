@@ -19,7 +19,7 @@ lLollision    = False
 
 # GAME GUI
 pygame.display.set_caption(TITLE)
-screen = pygame.display.set_mode((WINDOW_HEIGHT, WINDOW_WIDTH))
+screen = pygame.display.set_mode((WINDOW_HEIGHT, WINDOW_WIDTH), pygame.FULLSCREEN)
 background = pygame.image.load('res/Sprites/background.png')
 menu_background = pygame.image.load('res/Sprites/menu_screen.png')
 
